@@ -1,197 +1,349 @@
-// "use client";
-
-// import { ShoppingCart, Eye } from "lucide-react";
-// import { motion } from "framer-motion";
-// import Image from "next/image";
-// import Link from "next/link";
-// import { useEffect, useState } from "react";
-
-// // --- Constants ---
-// const bookImgPath = "/assets/book.avif";
-// const whatsappNumber = "+923365495060";
-
-// // --- Utility Classes ---
-// const BRAND_ACCENT = "bg-brand-accent";
-// const BRAND_ACCENT_TEXT = "text-brand-accent";
-// const BRAND_PRIMARY_TEXT = "text-brand-primary-text";
-// const BRAND_SUBTLE_HOVER = "border-brand-subtle-hover";
-
-// export default function Books() {
-//   const [books, setBooks] = useState([]);
-//   const [loading, setLoading] = useState(true);
-
-//   // Fetch books from Archive.org API
-//   useEffect(() => {
-//     const loadBooks = async () => {
-//       try {
-//         const res = await fetch("/api/books");
-//         const data = await res.json();
-//         setBooks(data);
-//       } catch (err) {
-//         console.error("Failed to load books:", err);
-//         setBooks([]);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     loadBooks();
-//   }, []);
-
-//   return (
-//     <div className="bg-brand-light-bg min-h-screen py-16 px-4 sm:px-6 lg:px-12">
-//       <div className="max-w-6xl mx-auto text-center mb-10">
-//         <h3
-//           className={`text-3xl md:text-4xl font-extrabold ${BRAND_PRIMARY_TEXT} relative inline-block`}
-//         >
-//           کتابیں
-//           <span
-//             className={`absolute -bottom-2 start-1/2 -translate-x-1/2 w-24 h-1 ${BRAND_ACCENT} rounded-full`}
-//           ></span>
-//         </h3>
-//       </div>
-
-//       {/* Loading Skeleton */}
-//       {loading && (
-//         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 animate-pulse">
-//           {[1, 2, 3, 4].map((n) => (
-//             <div
-//               key={n}
-//               className="bg-white rounded-2xl shadow border p-6 h-40"
-//             ></div>
-//           ))}
-//         </div>
-//       )}
-
-//       {/* Books Grid */}
-//       {!loading && (
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-//           {books.map((book, idx) => (
-//             <motion.div
-//               key={book.id}
-//               initial={{ opacity: 0, y: 20 }}
-//               animate={{ opacity: 1, y: 0 }}
-//               transition={{ duration: 0.3, delay: idx * 0.1 }}
-//               className={`bg-white rounded-2xl shadow hover:shadow-lg border ${BRAND_SUBTLE_HOVER} p-6 flex flex-col md:flex-row gap-6`}
-//             >
-//               {/* Thumbnail */}
-//               <div className="w-full md:w-1/3 flex justify-center flex-shrink-0">
-//                 <Image
-//                   src={bookImgPath}
-//                   alt={book.title}
-//                   width={160}
-//                   height={220}
-//                   className="object-cover rounded-lg border border-gray-300"
-//                 />
-//               </div>
-
-//               {/* Text Content */}
-//               <div className="flex-1 text-right">
-//                 <h3
-//                   className={`text-xl font-bold ${BRAND_ACCENT_TEXT} mb-1 leading-snug`}
-//                 >
-//                   {book.title}
-//                 </h3>
-
-//                 <p className="text-sm text-gray-700 font-semibold mb-4">
-//                   قیمت: {book.price || "مفت"}
-//                 </p>
-
-//                 <div className="flex flex-wrap gap-3 justify-start">
-
-//                   {/* Buy Button */}
-//                   <Link
-//                     href={`https://wa.me/${whatsappNumber}?text=میں ${encodeURIComponent(
-//                       book.title
-//                     )} کتاب خریدنا چاہتا ہوں۔`}
-//                     target="_blank"
-//                     className="flex items-center gap-1 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow hover:bg-green-700"
-//                   >
-//                     <ShoppingCart size={16} /> خریدیں
-//                   </Link>
-
-//                   {/* View Online - BookReader */}
-//                   <Link
-//                     href={book.embed}
-//                     target="_blank"
-//                     className="flex items-center gap-1 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow hover:bg-purple-700"
-//                   >
-//                     📖 آن لائن پڑھیں
-//                   </Link>
-
-//                   {/* PDF Viewer (if PDF exists) */}
-//                   {book.pdf ? (
-//                     <Link
-//                       href={`/pdf-viewer?book=${encodeURIComponent(
-//                         book.title
-//                       )}&price=${encodeURIComponent(
-//                         book.price || "مفت"
-//                       )}&pdf=${encodeURIComponent(book.pdf)}`}
-//                       className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow hover:bg-blue-700"
-//                     >
-//                       <Eye size={16} /> پی ڈی ایف دیکھیں
-//                     </Link>
-//                   ) : (
-//                     <button
-//                       disabled
-//                       className="flex items-center gap-1 bg-gray-300 text-gray-600 px-4 py-2 rounded-lg text-sm cursor-not-allowed"
-//                     >
-//                       پی ڈی ایف موجود نہیں
-//                     </button>
-//                   )}
-//                 </div>
-//               </div>
-//             </motion.div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
-export default function BooksPage() {
+export default function Books() {
   const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(true);
+  const [pdfError, setPdfError] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    author: "",
+    price: "",
+    link: "",
+  });
 
+  // Add styles to hide Google Docs toolbar
   useEffect(() => {
-    async function loadBooks() {
-      const res = await fetch("/api/books");
-      const data = await res.json();
-      setBooks(data);
-    }
-
-    loadBooks();
+    const style = document.createElement("style");
+    style.innerHTML = `
+      /* Hide and disable Google Docs toolbar completely */
+      .goog-inline-block { display: none !important; }
+      [role="toolbar"] { display: none !important; }
+      .goog-menu { display: none !important; }
+      .goog-menubutton { display: none !important; }
+      button[aria-label*="Open"] { display: none !important; }
+      button[aria-label*="open"] { display: none !important; }
+      a[href*="docs.google.com"] { pointer-events: none !important; }
+      /* Hide all toolbar buttons in the top right */
+      div[jsname] { pointer-events: none !important; }
+      /* Disable all buttons in Google Docs viewer */
+      .docs-gvh-buttonpair { display: none !important; }
+      .docs-gvh-button { display: none !important; }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
+  // Fetch books from API
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/books");
+      if (!response.ok) throw new Error("Failed to fetch books");
+      const data = await response.json();
+      setBooks(data);
+    } catch (err) {
+      console.error("Error fetching books:", err);
+      setError("Failed to load books");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/books", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add book");
+      }
+
+      const newBook = await response.json();
+      setBooks((prev) => [...prev, newBook]);
+      setFormData({
+        title: "",
+        author: "",
+        price: "",
+        link: "",
+      });
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Error adding book:", err);
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Books</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {books.map((b, i) => (
-          <div key={i} className="border rounded-lg p-4 shadow">
-            <h3 className="text-xl font-semibold">{b.title}</h3>
-
-            <p className="text-gray-600 mt-2">Price: {b.price} PKR</p>
-
-            <a
-              className="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded"
-              href={`/pdf-viewer?book=${encodeURIComponent(b.title)}&price=${encodeURIComponent(b.price)}&pdf=${encodeURIComponent(b.pdf)}`}
-            >
-              Open
-            </a>
+    <div className="bg-brand-light-bg min-h-screen">
+      {/* ✅ Heading with Add Button */}
+      {!selectedBook && (
+        <div className="py-16 px-4 sm:px-6 lg:px-12">
+          <div className="max-w-6xl mx-auto text-center mb-12">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-brand-primary-text">
+                کتابیں
+              </h2>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-full text-2xl transition shadow-md"
+                title="Add new book"
+              >
+                +
+              </button>
+            </div>
+            <div className="mt-2 w-20 h-1 bg-brand-accent rounded mx-auto"></div>
           </div>
-        ))}
-      </div>
+
+          {/* ✅ Error Message */}
+          {error && (
+            <div className="max-w-6xl mx-auto mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* ✅ Loading State */}
+          {loading && (
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div key={n} className="bg-white rounded-2xl shadow border p-6 h-48"></div>
+              ))}
+            </div>
+          )}
+
+          {/* ✅ Books Grid */}
+          {!loading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {books.length === 0 ? (
+                <p className="text-center text-gray-500 col-span-full">کوئی کتابیں نہیں</p>
+              ) : (
+                books.map((book, idx) => (
+                  <motion.div
+                    key={book.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: idx * 0.1 }}
+                    onClick={() => {
+                      setSelectedBook(book);
+                      setPdfLoading(true);
+                      setPdfError("");
+                    }}
+                    className="bg-white rounded-2xl shadow hover:shadow-lg border border-brand-subtle-hover p-6 cursor-pointer transition hover:scale-105 transform"
+                  >
+                    <h3 className="text-lg font-bold text-brand-accent mb-2 leading-snug line-clamp-2">
+                      {book.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2">مصنف: {book.author}</p>
+                    <p className="text-sm text-gray-700 font-semibold mb-3">
+                      قیمت: {book.price || "مفت"}
+                    </p>
+                    <button className="w-full bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition">
+                      کھولیں
+                    </button>
+                  </motion.div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ✅ PDF Viewer */}
+      {selectedBook && (
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          {/* Header */}
+          <div className="bg-brand-accent text-white p-4 flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold">{selectedBook.title}</h2>
+              <p className="text-sm text-gray-100">مصنف: {selectedBook.author}</p>
+            </div>
+            <button
+              onClick={() => {
+                setSelectedBook(null);
+                setPdfLoading(true);
+                setPdfError("");
+              }}
+              className="text-white hover:bg-brand-accent-dark p-2 rounded-lg transition text-xl font-bold"
+              title="بند کریں"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Loading State */}
+          {pdfLoading && (
+            <div className="flex-1 flex items-center justify-center bg-black">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-accent mx-auto mb-4"></div>
+                <p className="text-white">PDF لوڈ ہو رہی ہے...</p>
+              </div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {pdfError && (
+            <div className="flex-1 flex items-center justify-center bg-black">
+              <div className="text-center">
+                <p className="text-red-400 mb-4">PDF لوڈ نہیں ہو سکی</p>
+                <a
+                  href={selectedBook.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-6 rounded-lg transition"
+                >
+                  براہ راست کھولیں
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Embedded PDF */}
+          {!pdfError && (
+            <div className="flex-1 overflow-hidden relative">
+              {/* Blocking overlay to prevent toolbar clicks */}
+              <div 
+                className="absolute top-0 right-0 h-16 z-10 pointer-events-auto"
+                style={{ width: '200px' }}
+                onClick={(e) => e.preventDefault()}
+              />
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(selectedBook.link)}&embedded=true`}
+                className="w-full h-full border-none"
+                title={selectedBook.title}
+                onLoad={() => setPdfLoading(false)}
+                onError={() => {
+                  setPdfLoading(false);
+                  setPdfError("PDF لوڈ نہیں ہو سکی");
+                }}
+                allow="fullscreen"
+                allowFullScreen
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ✅ Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl my-8">
+            <h3 className="text-2xl font-bold text-brand-primary-text mb-6">نئی کتاب شامل کریں</h3>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  عنوان
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  placeholder="کتاب کا عنوان"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  مصنف
+                </label>
+                <input
+                  type="text"
+                  name="author"
+                  value={formData.author}
+                  onChange={handleInputChange}
+                  placeholder="مصنف کا نام"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  قیمت (اختیاری)
+                </label>
+                <input
+                  type="text"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  placeholder="مثلاً 500 یا مفت"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  PDF لنک
+                </label>
+                <input
+                  type="url"
+                  name="link"
+                  value={formData.link}
+                  onChange={handleInputChange}
+                  placeholder="https://example.com/book.pdf"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition disabled:opacity-50"
+                >
+                  {submitting ? "جاری ہے..." : "شامل کریں"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition"
+                >
+                  منسوخ کریں
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

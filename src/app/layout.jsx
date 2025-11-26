@@ -8,6 +8,9 @@ export const metadata = {
   icons: {
     icon: '/assets/logo.avif',
   },
+  headers: {
+    'Permissions-Policy': 'fullscreen=(self "https://archive.org")',
+  },
 };
 
 export default function RootLayout({
