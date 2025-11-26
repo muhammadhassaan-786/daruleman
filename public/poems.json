@@ -1,0 +1,132 @@
+[
+  {
+    "id": 1,
+    "title": "لب پہ آتی ہے دعا",
+    "poet": "علامہ اقبال",
+    "lang": "urdu",
+    "lines": [
+      "لب پہ آتی ہے دعا بن کے تمنا میری",
+      "زندگی شمع کی صورت ہو خدایا میری"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "خودی کا سر نہاں",
+    "poet": "علامہ اقبال",
+    "lang": "urdu",
+    "lines": [
+      "خودی کا سر نہاں لا الہ الا اللہ",
+      "خودی ہے تیغ، فساں لا الہ الا اللہ"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "اے خدا",
+    "poet": "احمد فراز",
+    "lang": "urdu",
+    "lines": [
+      "اے خدا دل ہے پریشاں تیری دنیا میں",
+      "کر دے آسان یہ مشکل میری دنیا میں"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "نعت شریف",
+    "poet": "نامعلوم",
+    "lang": "urdu",
+    "lines": [
+      "وہ سوئے لالہ زار پھرتے ہیں",
+      "تیرے دن اے بہار پھرتے ہیں"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Hope is the Thing",
+    "poet": "Emily Dickinson",
+    "lang": "english",
+    "lines": [
+      "Hope is the thing with feathers",
+      "That perches in the soul –"
+    ]
+  },
+  {
+    "id": 6,
+    "title": "The Road Not Taken",
+    "poet": "Robert Frost",
+    "lang": "english",
+    "lines": [
+      "Two roads diverged in a yellow wood,",
+      "And sorry I could not travel both"
+    ]
+  },
+  {
+    "id": 7,
+    "title": "زما یاره",
+    "poet": "رحمان بابا",
+    "lang": "pashto",
+    "lines": [
+      "زما یاره زما د زړه قرار دی",
+      "بې د یاره ژوند لکه د غم دار دی"
+    ]
+  },
+  {
+    "id": 8,
+    "title": "قصيدة البردة",
+    "poet": "الإمام البوصيري",
+    "lang": "arabic",
+    "lines": [
+      "محمد سيد الكونين والثقلين",
+      "والفريقين من عرب ومن عجم"
+    ]
+  },
+  {
+    "id": 9,
+    "title": "بنی آدم",
+    "poet": "سعدی شیرازی",
+    "lang": "farsi",
+    "lines": [
+      "بنی آدم اعضای یکدیگرند",
+      "که در آفرينش ز یک گوهرند"
+    ]
+  },
+  {
+    "id": 10,
+    "title": "İstiklâl Marşı",
+    "poet": "Mehmet Akif Ersoy",
+    "lang": "turkish",
+    "lines": [
+      "Korkma, sönmez bu şafaklarda yüzen al sancak;",
+      "Sönmeden yurdumun üstünde tüten en son ocak."
+    ]
+  },
+  {
+    "id": 11,
+    "title": "سنڌڙي، تون وڏيءَ مهربان آهين،",
+    "poet": "شيخ اياز",
+    "lang": "sindhi",
+    "lines": [
+      "سنڌڙي، تون وڏيءَ مهربان آهين،",
+      "تو سان ئي منھنجو سارو جهان آهي."
+    ]
+  },
+  {
+    "id": 12,
+    "title": "اج آکھاں وارث شاہ نو",
+    "poet": "امرتا پریتم",
+    "lang": "punjabi",
+    "lines": [
+      "اج آکھاں وارث شاہ نو، کتوں قبراں وچوں بول",
+      "تے اج کتاب عشق دا کوئی اگلا ورقہ پھول"
+    ]
+  },
+  {
+    "id": 13,
+    "title": "خودی کا سر نہاں",
+    "poet": "علامہ اقبال",
+    "lang": "urdu",
+    "lines": [
+      "خودی کا سر نہاں لا الہ الا اللہ",
+      "خودی ہے تیغ، فساں لا الہ الا اللہ"
+    ]
+  }
+]
