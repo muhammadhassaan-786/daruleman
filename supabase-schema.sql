@@ -61,8 +61,26 @@ CREATE POLICY "Allow public read" ON hamdonaatokalaam FOR SELECT USING (true);
 CREATE POLICY "Allow public read" ON poems FOR SELECT USING (true);
 CREATE POLICY "Allow public read" ON quotes FOR SELECT USING (true);
 
+-- Create books table
+CREATE TABLE IF NOT EXISTS books (
+  id BIGSERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  author TEXT NOT NULL,
+  price TEXT NOT NULL DEFAULT 'Free',
+  link TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create policies to allow public insert (you can add authentication later)
 CREATE POLICY "Allow public insert" ON audiobayanat FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public insert" ON hamdonaatokalaam FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public insert" ON poems FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public insert" ON quotes FOR INSERT WITH CHECK (true);
+
+-- Enable Row Level Security for books
+ALTER TABLE books ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for books table
+CREATE POLICY "Allow public read" ON books FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON books FOR INSERT WITH CHECK (true);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Music, Mic, BookOpen, Quote } from "lucide-react";
+import { Plus, Music, Mic, BookOpen, Quote, Library } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Functions() {
@@ -42,6 +42,14 @@ export default function Functions() {
     author: "",
     source: "",
     lang: "urdu",
+  });
+
+  // Books Form State
+  const [booksFormData, setBooksFormData] = useState({
+    title: "",
+    author: "",
+    price: "Free",
+    link: "",
   });
 
   const languages = [
@@ -225,6 +233,40 @@ export default function Functions() {
     }
   };
 
+  // Handlers for Books
+  const handleBooksChange = (e) => {
+    const { name, value } = e.target;
+    setBooksFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleBooksSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/books", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(booksFormData),
+      });
+
+      if (!response.ok) throw new Error("Failed to add book");
+      setBooksFormData({
+        title: "",
+        author: "",
+        price: "Free",
+        link: "",
+      });
+      setActiveModal(null);
+      alert("Book added successfully!");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const closeModal = () => {
     setActiveModal(null);
     setError("");
@@ -262,6 +304,14 @@ export default function Functions() {
       icon: Quote,
       color: "bg-orange-500",
       description: "حکیمانہ الفاظ شامل کریں",
+    },
+    {
+      id: "books",
+      label: "Books",
+      urdu: "کتابیں",
+      icon: Library,
+      color: "bg-red-500",
+      description: "کتابیں شامل کریں",
     },
   ];
 
@@ -737,6 +787,102 @@ export default function Functions() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition disabled:opacity-50"
+                >
+                  {submitting ? "جاری ہے..." : "شامل کریں"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition"
+                >
+                  منسوخ کریں
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Books */}
+      {activeModal === "books" && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl my-8">
+            <h3 className="text-2xl font-bold text-brand-primary-text mb-6">
+              نیا کتاب شامل کریں
+            </h3>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleBooksSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  عنوان
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={booksFormData.title}
+                  onChange={handleBooksChange}
+                  placeholder="کتاب کا عنوان"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  مصنف
+                </label>
+                <input
+                  type="text"
+                  name="author"
+                  value={booksFormData.author}
+                  onChange={handleBooksChange}
+                  placeholder="مصنف کا نام"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  قیمت
+                </label>
+                <input
+                  type="text"
+                  name="price"
+                  value={booksFormData.price}
+                  onChange={handleBooksChange}
+                  placeholder="مثلاً: Free یا 500 PKR"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  لنک
+                </label>
+                <input
+                  type="url"
+                  name="link"
+                  value={booksFormData.link}
+                  onChange={handleBooksChange}
+                  placeholder="https://example.com/book"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
               </div>
 
               <div className="flex gap-3 pt-4">

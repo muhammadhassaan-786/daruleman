@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
-import path from "path";
-import { promises as fs } from "fs";
-
-const filePath = path.join(process.cwd(), "public/books/books.json");
+import { supabase } from "@/lib/supabase";
 
 export async function GET() {
   try {
-    const jsonData = await fs.readFile(filePath, "utf-8");
-    const books = JSON.parse(jsonData);
-    return NextResponse.json(books);
+    const { data, error } = await supabase
+      .from("books")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    return NextResponse.json(data || []);
   } catch (error) {
+    console.error("Error fetching books:", error);
     return NextResponse.json(
       { error: "Failed to load books", details: error.message },
       { status: 500 }
@@ -30,30 +33,29 @@ export async function POST(request) {
       );
     }
 
-    // Read existing books
-    const jsonData = await fs.readFile(filePath, "utf-8");
-    const books = JSON.parse(jsonData);
-
-    // Generate new ID
-    const newId = books.length > 0 ? Math.max(...books.map((b) => b.id)) + 1 : 1;
-
     // Create new book object
     const newBook = {
-      id: newId,
       title,
       author,
       price: price || "Free",
       link,
     };
 
-    // Add to array and write back
-    books.push(newBook);
-    await fs.writeFile(filePath, JSON.stringify(books, null, 2));
+    // Insert into Supabase
+    const { data, error } = await supabase
+      .from("books")
+      .insert([newBook])
+      .select();
 
-    return NextResponse.json(newBook, { status: 201 });
+    if (error) throw error;
+
+    return NextResponse.json(data?.[0], { status: 201 });
   } catch (error) {
     console.error("Error adding book:", error);
-    return NextResponse.json({ error: "Failed to add book" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to add book", details: error.message },
+      { status: 500 }
+    );
   }
 }
 
