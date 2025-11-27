@@ -1,16 +1,18 @@
-import { promises as fs } from "fs";
-import { join } from "path";
+import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
-
-const filePath = join(process.cwd(), "public/audiobayanat.json");
 
 export async function GET() {
   try {
-    const data = await fs.readFile(filePath, "utf-8");
-    const audiobayanat = JSON.parse(data);
-    return NextResponse.json(audiobayanat);
+    const { data, error } = await supabase
+      .from("audiobayanat")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) throw error;
+
+    return NextResponse.json(data || []);
   } catch (error) {
-    console.error("Error reading audiobayanat:", error);
+    console.error("Error fetching audiobayanat:", error);
     return NextResponse.json(
       { error: "Failed to load audiobayanat" },
       { status: 500 }
@@ -36,19 +38,8 @@ export async function POST(request) {
       );
     }
 
-    // Read existing data
-    const data = await fs.readFile(filePath, "utf-8");
-    const audiobayanat = JSON.parse(data);
-
-    // Generate new ID
-    const newId =
-      audiobayanat.length > 0
-        ? Math.max(...audiobayanat.map((b) => b.id)) + 1
-        : 1;
-
     // Create new entry with current date
     const newAudioBayan = {
-      id: newId,
       title: body.title,
       scholar: body.scholar,
       duration: body.duration,
@@ -57,13 +48,15 @@ export async function POST(request) {
       date: new Date().toISOString().split("T")[0],
     };
 
-    // Add to array
-    audiobayanat.push(newAudioBayan);
+    // Insert into Supabase
+    const { data, error } = await supabase
+      .from("audiobayanat")
+      .insert([newAudioBayan])
+      .select();
 
-    // Write back to file
-    await fs.writeFile(filePath, JSON.stringify(audiobayanat, null, 2));
+    if (error) throw error;
 
-    return NextResponse.json(newAudioBayan, { status: 201 });
+    return NextResponse.json(data[0], { status: 201 });
   } catch (error) {
     console.error("Error adding audiobayanat:", error);
     return NextResponse.json(
