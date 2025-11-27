@@ -12,16 +12,7 @@ export default function Kalaam() {
   const [currentAudio, setCurrentAudio] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({
-    title: "",
-    scholar: "",
-    duration: "",
-    lang: "urdu",
-    url: "",
-  });
 
   const audioRef = useRef(null);
 
@@ -49,51 +40,6 @@ export default function Kalaam() {
     } catch (err) {
       console.error("Error fetching audiobayanat:", err);
       setError("Failed to load audiobayanat");
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError("");
-
-    try {
-      const response = await fetch("/api/audiobayanat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add audiobayanat");
-      }
-
-      const newAudioBayan = await response.json();
-      setAudiobayanat((prev) => [...prev, newAudioBayan]);
-      setFormData({
-        title: "",
-        scholar: "",
-        duration: "",
-        lang: "urdu",
-        url: "",
-      });
-      setIsModalOpen(false);
-    } catch (err) {
-      console.error("Error adding audiobayanat:", err);
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -158,20 +104,11 @@ export default function Kalaam() {
 
   return (
     <div className="bg-brand-light-bg min-h-screen py-16 px-4 sm:px-6 lg:px-12">
-      {/* Section Heading with Add Button */}
+      {/* Section Heading */}
       <div className="max-w-6xl mx-auto text-center mb-10">
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <h3 className={`text-3xl md:text-4xl font-extrabold ${BRAND_DARK_TEXT}`}>
-            آڈیو بیانات
-          </h3>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-full text-2xl transition shadow-md"
-            title="Add new audiobayanat"
-          >
-            +
-          </button>
-        </div>
+        <h3 className={`text-3xl md:text-4xl font-extrabold ${BRAND_DARK_TEXT} mb-4`}>
+          آڈیو بیانات
+        </h3>
         <span className={`block w-24 h-1 ${BRAND_ACCENT} rounded-full mx-auto`}></span>
       </div>
 
@@ -379,111 +316,6 @@ export default function Kalaam() {
         )}
       </AnimatePresence>
 
-      {/* ✅ Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl my-8">
-            <h3 className="text-2xl font-bold text-brand-primary-text mb-6">نیا بیان شامل کریں</h3>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  عنوان
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  placeholder="بیان کا عنوان"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  مقرر
-                </label>
-                <input
-                  type="text"
-                  name="scholar"
-                  value={formData.scholar}
-                  onChange={handleInputChange}
-                  placeholder="مقرر کا نام"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  مدت (مثلاً 30:15)
-                </label>
-                <input
-                  type="text"
-                  name="duration"
-                  value={formData.duration}
-                  onChange={handleInputChange}
-                  placeholder="مثلاً 30:15"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  زبان
-                </label>
-                <select
-                  name="lang"
-                  value={formData.lang}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                >
-                  {languages.map((lang) => (
-                    <option key={lang} value={lang}>
-                      {lang.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  آڈیو لنک
-                </label>
-                <input
-                  type="url"
-                  name="url"
-                  value={formData.url}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/audio.mp3"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  required
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition disabled:opacity-50"
-                >
-                  {submitting ? "جاری ہے..." : "شامل کریں"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition"
-                >
-                  منسوخ کریں
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

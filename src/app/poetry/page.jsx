@@ -8,14 +8,6 @@ export default function Poetry() {
   const [activeLang, setActiveLang] = useState("urdu");
   const [poems, setPoems] = useState([]);
   const [error, setError] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    title: "",
-    poet: "",
-    lang: "urdu",
-    lines: ["", ""],
-  });
 
   const languages = [
     "urdu",
@@ -42,72 +34,6 @@ export default function Poetry() {
     } catch (err) {
       console.error("Error fetching poems:", err);
       setError("Failed to load poems");
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleLineChange = (index, value) => {
-    setFormData((prev) => {
-      const newLines = [...prev.lines];
-      newLines[index] = value;
-      return { ...prev, lines: newLines };
-    });
-  };
-
-  const addLineField = () => {
-    setFormData((prev) => ({
-      ...prev,
-      lines: [...prev.lines, ""],
-    }));
-  };
-
-  const removeLineField = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      lines: prev.lines.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError("");
-
-    try {
-      const response = await fetch("/api/poems", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add poem");
-      }
-
-      const newPoem = await response.json();
-      setPoems((prev) => [...prev, newPoem]);
-      setFormData({
-        title: "",
-        poet: "",
-        lang: "urdu",
-        lines: ["", ""],
-      });
-      setIsModalOpen(false);
-    } catch (err) {
-      console.error("Error adding poem:", err);
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -169,21 +95,12 @@ export default function Poetry() {
 
   return (
     <div className="bg-brand-light-bg min-h-screen py-10 px-3 sm:px-6 lg:px-12">
-      {/* ✅ Title with Add Button */}
+      {/* ✅ Title */}
       <div className="max-w-6xl mx-auto text-center mb-8 sm:mb-12">
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-brand-primary-text">
-            اشعار (تحریری)
-          </h3>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-full text-2xl transition shadow-md"
-            title="Add new poem"
-          >
-            +
-          </button>
-        </div>
-        <span className="absolute left-1/2 transform -translate-x-1/2 w-20 sm:w-24 h-1 bg-brand-accent rounded-full inline-block"></span>
+        <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-brand-primary-text mb-4">
+          اشعار (تحریری)
+        </h3>
+        <span className="w-20 sm:w-24 h-1 bg-brand-accent rounded-full inline-block"></span>
       </div>
 
       {/* ✅ Error Message */}
@@ -271,115 +188,6 @@ export default function Poetry() {
             )}
           </div>
 
-      {/* ✅ Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl my-8">
-            <h3 className="text-2xl font-bold text-brand-primary-text mb-6">نیا شعر شامل کریں</h3>
-
-            <form onSubmit={handleSubmit} className="space-y-4 max-h-96 overflow-y-auto">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  عنوان
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  placeholder="شعر کا عنوان"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  شاعر
-                </label>
-                <input
-                  type="text"
-                  name="poet"
-                  value={formData.poet}
-                  onChange={handleInputChange}
-                  placeholder="شاعر کا نام"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  زبان
-                </label>
-                <select
-                  name="lang"
-                  value={formData.lang}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                >
-                  {languages.map((lang) => (
-                    <option key={lang} value={lang}>
-                      {lang.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  اشعار (لائنیں)
-                </label>
-                {formData.lines.map((line, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={line}
-                      onChange={(e) => handleLineChange(index, e.target.value)}
-                      placeholder={`لائن ${index + 1}`}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                      required
-                    />
-                    {formData.lines.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeLineField(index)}
-                        className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addLineField}
-                  className="text-sm text-brand-accent hover:text-brand-primary-text mt-2"
-                >
-                  + لائن شامل کریں
-                </button>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition disabled:opacity-50"
-                >
-                  {submitting ? "جاری ہے..." : "شامل کریں"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition"
-                >
-                  منسوخ کریں
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

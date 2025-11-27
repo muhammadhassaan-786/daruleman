@@ -5,14 +5,6 @@ import { useState, useEffect } from "react";
 export default function Malfoozat() {
   const [activeLang, setActiveLang] = useState("urdu");
   const [malfoozat, setMalfoozat] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    quote: "",
-    author: "",
-    source: "",
-    lang: "urdu",
-  });
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
   const languages = ["sindhi", "urdu", "english", "pashto", "arabic", "persian", "turkish"];
@@ -34,68 +26,14 @@ export default function Malfoozat() {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError("");
-
-    try {
-      const response = await fetch("/api/quotes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add quote");
-      }
-
-      const newQuote = await response.json();
-      setMalfoozat((prev) => [...prev, newQuote]);
-      setFormData({
-        quote: "",
-        author: "",
-        source: "",
-        lang: "urdu",
-      });
-      setIsModalOpen(false);
-      alert(`Quote added successfully with ID: ${newQuote.id}`);
-    } catch (err) {
-      console.error("Error adding quote:", err);
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <div className="bg-brand-light-bg min-h-screen py-16 px-4 sm:px-6 lg:px-12">
-      {/* ✅ Heading with Add Button */}
+      {/* ✅ Heading */}
       <div className="text-center mb-12">
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-brand-primary-text">
-            ملفوظات
-          </h2>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-full text-2xl transition shadow-md"
-            title="Add new quote"
-          >
-            +
-          </button>
-        </div>
-        <div className="mt-2 w-20 h-1 bg-brand-accent rounded mx-auto"></div>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-brand-primary-text mb-4">
+          ملفوظات
+        </h2>
+        <div className="w-20 h-1 bg-brand-accent rounded mx-auto"></div>
       </div>
 
       {/* ✅ Error Message */}
@@ -150,96 +88,6 @@ export default function Malfoozat() {
         )}
       </div>
 
-      {/* ✅ Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <h3 className="text-2xl font-bold text-brand-primary-text mb-6">نیا ملفوظہ شامل کریں</h3>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  ملفوظہ
-                </label>
-                <textarea
-                  name="quote"
-                  value={formData.quote}
-                  onChange={handleInputChange}
-                  placeholder="ملفوظہ درج کریں"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  rows="4"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  مقرّر
-                </label>
-                <input
-                  type="text"
-                  name="author"
-                  value={formData.author}
-                  onChange={handleInputChange}
-                  placeholder="مقرّر کا نام"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  ماخذ
-                </label>
-                <input
-                  type="text"
-                  name="source"
-                  value={formData.source}
-                  onChange={handleInputChange}
-                  placeholder="ماخذ درج کریں"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  زبان
-                </label>
-                <select
-                  name="lang"
-                  value={formData.lang}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-                >
-                  {languages.map((lang) => (
-                    <option key={lang} value={lang}>
-                      {lang.charAt(0).toUpperCase() + lang.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition disabled:opacity-50"
-                >
-                  {submitting ? "جاری ہے..." : "شامل کریں"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition"
-                >
-                  منسوخ کریں
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
