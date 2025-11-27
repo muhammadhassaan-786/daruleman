@@ -1,24 +1,56 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation"; // ⬅️ Use Next.js Router for navigation function
-import Image from "next/image"; // ⬅️ Use Next.js Image
-import Link from "next/link"; // ⬅️ Use Next.js Link for navigation
-import { FaUser } from "react-icons/fa"; // FontAwesome icon library
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { FaUser } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
-// ⚠️ Static asset imports replaced with direct paths from the /public folder
 const logoPath = "/assets/logo.avif";
 const audioPath = "/assets/audio.mp3";
 const bg3Path = "/assets/bg3.avif";
 
 export default function Home() {
-    const router = useRouter(); // ⬅️ Initializes Next.js Router
+    const router = useRouter();
+    const [quotes, setQuotes] = useState([]);
+    const [audios, setAudios] = useState([]);
+    const [bayanaat, setBayanaat] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const quotes = [
-        { text: "صبر ایک درخت ہے جس کی جڑیں کڑوی ہوتی ہیں، لیکن پھل میٹھا ہوتا ہے۔", author: "حضرت علی کرم اللہ وجہہ" },
-        { text: "دنیا مومن کے لیے قید خانہ ہے اور کافر کے لیے جنت۔", author: "نبی کریم ﷺ" },
-        { text: "اپنے رب سے ڈرو اور کسی مخلوق سے نہ ڈرو۔", author: "شیخ عبدالقادر جیلانی" },
-    ];
+    // Fetch latest data from APIs
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch quotes (malfoozat)
+                const quotesRes = await fetch("/api/quotes");
+                if (quotesRes.ok) {
+                    const quotesData = await quotesRes.json();
+                    setQuotes(quotesData.slice(0, 3));
+                }
+
+                // Fetch audio bayanaat
+                const audioRes = await fetch("/api/audiobayanat");
+                if (audioRes.ok) {
+                    const audioData = await audioRes.json();
+                    setAudios(audioData.slice(0, 4));
+                }
+
+                // Fetch hamdonaatokalaam (bayanaat)
+                const bayRes = await fetch("/api/hamdonaatokalaam");
+                if (bayRes.ok) {
+                    const bayData = await bayRes.json();
+                    setBayanaat(bayData.slice(0, 3));
+                }
+            } catch (err) {
+                console.error("Error fetching data:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     // ❌ Corrected routes to match converted Next.js paths
     const features = [
@@ -26,13 +58,6 @@ export default function Home() {
         { icon: "🕌", title: "مفتی سید مختار الدین شاہ", desc: "تعارف، علمی و تحقیقی خدمات", route: "/chishthistory" },
         { icon: "📖", title: "کتابیں", desc: "مفید علمی و اصلاحی کتب", route: "/books" },
         { icon: "🕋", title: "آڈیو و کلام", desc: "قرآن و سنت پر مبنی تعلیمات کا علمبردار", route: "/audiobayanaat" },
-    ];
-
-    const audios = [
-        { date: "26 Aug 2025", title: "اصلاحی مجالس - حصہ اول", speaker: "مفتی سید مختار الدین شاہ صاحب", url: audioPath },
-        { date: "26 Aug 2025", title: "اصلاحی مجالس - حصہ دوم", speaker: "مفتی سید مختار الدین شاہ صاحب", url: audioPath },
-        { date: "26 Aug 2025", title: "اصلاحی مجالس - حصہ سوم", speaker: "مفتی سید مختار الدین شاہ صاحب", url: audioPath },
-        { date: "26 Aug 2025", title: "اصلاحی مجالس - حصہ چہارم", speaker: "مفتی سید مختار الدین شاہ صاحب", url: audioPath },
     ];
 
     const sectionVariants = {
@@ -172,7 +197,7 @@ export default function Home() {
                                     “
                                 </div>
                                 {/* ✅ text-brand-primary-text */}
-                                <p className="mt-6 text-brand-primary-text">{quote.text}</p>
+                                <p className="mt-6 text-brand-primary-text">{quote.quote}</p>
                                 {/* ✅ text-brand-accent */}
                                 <p className="mt-4 text-sm text-brand-accent">— {quote.author}</p>
                             </motion.div>
@@ -185,7 +210,7 @@ export default function Home() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             // ⬅️ Use Next.js router for navigation
-                            onClick={() => navigateTo("/malfoozat")}
+                            onClick={() => navigateTo("/quotes")}
                         >
                             تمام ملفوظات پڑھیں
                         </motion.button>
@@ -208,35 +233,94 @@ export default function Home() {
                     {/* ✅ bg-brand-accent */}
                     <div className="w-28 h-1 bg-brand-accent mx-auto mb-10 rounded-full"></div>
 
-                    {/* ✅ border-brand-subtle-hover */}
-                    <div className="bg-white border border-brand-subtle-hover rounded-xl shadow overflow-hidden">
-                        {audios.map((audio, idx) => (
-                            <div
-                                key={idx}
-                                className="flex items-center justify-between p-5 border-b border-brand-subtle-hover last:border-none"
-                            >
-                                <div className="text-right">
-                                    {/* ✅ text-brand-accent */}
-                                    <h3 className="text-lg font-semibold text-brand-accent">{audio.title}</h3>
-                                    {/* ✅ text-brand-primary-text */}
-                                    <p className="text-sm text-brand-primary-text">{audio.speaker}</p>
+                    {loading ? (
+                        <div className="text-center py-10">
+                            <p className="text-gray-500">لوڈ ہو رہا ہے...</p>
+                        </div>
+                    ) : audios.length > 0 ? (
+                        <div className="bg-white border border-brand-subtle-hover rounded-xl shadow overflow-hidden">
+                            {audios.map((audio, idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex items-center justify-between p-5 border-b border-brand-subtle-hover last:border-none"
+                                >
+                                    <div className="text-right">
+                                        <h3 className="text-lg font-semibold text-brand-accent">{audio.title}</h3>
+                                        <p className="text-sm text-brand-primary-text">{audio.scholar}</p>
+                                    </div>
+                                    <p className="text-sm text-brand-primary-text">{audio.duration}</p>
                                 </div>
-                                {/* ✅ text-brand-primary-text */}
-                                <p className="text-sm text-brand-primary-text">{audio.date}</p>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-10">
+                            <p className="text-gray-500">کوئی آڈیو دستیاب نہیں</p>
+                        </div>
+                    )}
 
                     <div className="text-center mt-8">
                         <motion.button
-                            // ✅ bg-brand-accent
                             className="px-6 py-3 bg-brand-accent text-white rounded-lg shadow-md"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            // ⬅️ Use Next.js router for navigation
                             onClick={() => navigateTo("/audiobayanaat")}
                         >
                             تمام آڈیو بیانات سنیں
+                        </motion.button>
+                    </div>
+                </motion.section>
+
+                {/* تازہ ترین حمد و نعت و کلام */}
+                <motion.section
+                    className="py-16 md:py-20"
+                    variants={sectionVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                >
+                    {/* ✅ text-brand-accent */}
+                    <h2 className="text-3xl md:text-4xl font-bold text-center text-brand-accent mb-4">
+                        تازہ ترین حمد و نعت و کلام
+                    </h2>
+                    {/* ✅ bg-brand-accent */}
+                    <div className="w-28 h-1 bg-brand-accent mx-auto mb-10 rounded-full"></div>
+
+                    {loading ? (
+                        <div className="text-center py-10">
+                            <p className="text-gray-500">لوڈ ہو رہا ہے...</p>
+                        </div>
+                    ) : bayanaat.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {bayanaat.map((item, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    className="bg-white rounded-2xl shadow-lg p-6 border border-brand-subtle-hover"
+                                    variants={cardVariants}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    whileHover="hover"
+                                    viewport={{ once: true }}
+                                >
+                                    <h3 className="text-lg font-semibold text-brand-accent mb-2">{item.title}</h3>
+                                    <p className="text-sm text-brand-primary-text mb-3">مقرر: {item.scholar}</p>
+                                    <p className="text-xs text-gray-500">مدت: {item.duration}</p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-10">
+                            <p className="text-gray-500">کوئی حمد و نعت دستیاب نہیں</p>
+                        </div>
+                    )}
+
+                    <div className="text-center mt-10">
+                        <motion.button
+                            className="px-6 py-3 bg-brand-accent text-white rounded-lg shadow-md"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => navigateTo("/hamdonaat")}
+                        >
+                            تمام حمد و نعت و کلام سنیں
                         </motion.button>
                     </div>
                 </motion.section>

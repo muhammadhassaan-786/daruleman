@@ -75,7 +75,63 @@ export default function Maqasid() {
             <p className={`text-xl ${BRAND_ACCENT} font-medium`}>تین ستونِ حیات — ہر ایک میں سات نورانی نکات</p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Objectives Section */}
+          <div className="mb-16 bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 lg:p-12 border border-brand-border">
+            <h2 className={`text-4xl font-bold ${BRAND_PRIMARY_TEXT} mb-4 text-center`}>
+              اس ہدف کے حصول کے لیے یہ تحریک تین مقاصد پر کام کرتی ہے:
+            </h2>
+            <div className="w-32 h-1 bg-brand-accent rounded mx-auto mb-10"></div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Objective 1 */}
+              <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-subtle-hover/30 to-white p-8 border border-brand-subtle-hover hover:border-brand-accent transition-all duration-300 hover:shadow-xl">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-brand-subtle-hover/50 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                <div className="relative">
+                  <div className={`flex items-center gap-3 mb-4`}>
+                    <div className={`flex-shrink-0 w-12 h-12 ${BRAND_BG} rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+                      ۱
+                    </div>
+                    <h3 className={`text-2xl font-bold ${BRAND_PRIMARY_TEXT}`}>تزکیہ نفس</h3>
+                  </div>
+                  <p className={`${BRAND_ACCENT} leading-relaxed text-justify`}>
+                    تقویٰ، طہارت، اللہ تعالیٰ کے ساتھ شدید محبت، اس کی عظمت و معرفت اور خشیت کے اعلیٰ درجات اور زندگی کے ہر گوشے میں احسانی کیفیت حاصل کرنے کے لیے مسلسل محنت و کوشش کرنا۔ اور اپنے گردوپیش کو بھی اصلاح و تربیت اور ایمانی اوصاف و کمالات سے آراستہ ہونے کی جانب توجہ دلانا اور اس کے لیے عملی اقدامات کرنا۔
+                  </p>
+                </div>
+              </div>
+
+              {/* Objective 2 */}
+              <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-subtle-hover/30 to-white p-8 border border-brand-subtle-hover hover:border-brand-accent transition-all duration-300 hover:shadow-xl">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-brand-subtle-hover/50 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                <div className="relative">
+                  <div className={`flex items-center gap-3 mb-4`}>
+                    <div className={`flex-shrink-0 w-12 h-12 ${BRAND_BG} rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+                      ۲
+                    </div>
+                    <h3 className={`text-2xl font-bold ${BRAND_PRIMARY_TEXT}`}>پُورے دین پر عمل</h3>
+                  </div>
+                  <p className={`${BRAND_ACCENT} leading-relaxed text-justify`}>
+                    عقائد و ایمانیات سے لے کر عبادات، معاملات، معاشرت، حسنِ اخلاق اور حقوق و آداب تک پُورے کے پُورے دین پر خود عمل کرنا۔ دنیا کے سامنے دین اپنی کامل و مکمل اور صحیح سالم شکل میں پیش کرنا۔ دوسرے مسلمانوں کو بھی پُورے دین پر عمل پیرا ہونے کی ترغیب دینا اور ناقص دین پر عمل کرنے کے نقصانات سے آگاہ کرنا۔
+                  </p>
+                </div>
+              </div>
+
+              {/* Objective 3 */}
+              <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-subtle-hover/30 to-white p-8 border border-brand-subtle-hover hover:border-brand-accent transition-all duration-300 hover:shadow-xl">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-brand-subtle-hover/50 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                <div className="relative">
+                  <div className={`flex items-center gap-3 mb-4`}>
+                    <div className={`flex-shrink-0 w-12 h-12 ${BRAND_BG} rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+                      ۳
+                    </div>
+                    <h3 className={`text-2xl font-bold ${BRAND_PRIMARY_TEXT}`}>اتحادِ اُمت</h3>
+                  </div>
+                  <p className={`${BRAND_ACCENT} leading-relaxed text-justify`}>
+                    اُمت کے بکھرے ہوئے شیرازے کو دوبارہ یکجا کرنے میں اپنی پوری قوت صرف کرنا۔ بنیادی عقائد اور فروعی مسائل کو ہر ایک کے مرتبے پر رکھنا۔ مختلف دینی سرگرمیوں میں مشغول افراد کے درمیان تقابل و تفاخر کو باہمی تعاون و تناصر میں بدلنا۔
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
             {/* Tab Navigation */}
             <div className="space-y-4 lg:col-span-1">
               {maqasidData.map((section) => {
@@ -181,7 +237,6 @@ export default function Maqasid() {
             </div>
           </div>
         </div>
-      </div>
     </>
   );
 }
