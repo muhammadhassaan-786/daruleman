@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 
 export default function Books() {
   const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -51,7 +50,6 @@ export default function Books() {
 
   const fetchBooks = async () => {
     try {
-      setLoading(true);
       const response = await fetch("/api/books");
       if (!response.ok) throw new Error("Failed to fetch books");
       const data = await response.json();
@@ -59,8 +57,6 @@ export default function Books() {
     } catch (err) {
       console.error("Error fetching books:", err);
       setError("Failed to load books");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -136,22 +132,12 @@ export default function Books() {
             </div>
           )}
 
-          {/* ✅ Loading State */}
-          {loading && (
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="bg-white rounded-2xl shadow border p-6 h-48"></div>
-              ))}
-            </div>
-          )}
-
           {/* ✅ Books Grid */}
-          {!loading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {books.length === 0 ? (
-                <p className="text-center text-gray-500 col-span-full">کوئی کتابیں نہیں</p>
-              ) : (
-                books.map((book, idx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {books.length === 0 ? (
+              <p className="text-center text-gray-500 col-span-full">کوئی کتابیں نہیں</p>
+            ) : (
+              books.sort((a, b) => b.id - a.id).map((book, idx) => (
                   <motion.div
                     key={book.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -178,7 +164,6 @@ export default function Books() {
                 ))
               )}
             </div>
-          )}
         </div>
       )}
 

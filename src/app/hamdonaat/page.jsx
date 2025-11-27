@@ -4,16 +4,25 @@ import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Save, Download, X, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ⚠️ Static asset path
-const defaultAudioPath = "/assets/audio2.mp3";
-
 export default function Kalaam() {
   const [activeLang, setActiveLang] = useState("urdu");
+  const [hamdonaatokalaam, setHamdonaatokalaam] = useState([]);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [currentAudio, setCurrentAudio] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    scholar: "",
+    duration: "",
+    lang: "urdu",
+    url: "",
+  });
 
   const audioRef = useRef(null);
 
@@ -26,62 +35,70 @@ export default function Kalaam() {
     "urdu", "english", "pashto", "arabic", "farsi", "turkish", "sindhi", "punjabi",
   ];
 
-  // Data Array (Using public paths)
-  const bayanat = [
-    { id: 1, title: "اصلاحی مجالس - حصہ اول", scholar: "مفتی سید مختار الدین شاہ صاحب", date: "2025-09-28", duration: "30:15", lang: "urdu", url: defaultAudioPath },
-    { id: 2, title: "Islamic Lecture - Part 1", scholar: "Mufti Saeed Ahmad", date: "2025-09-27", duration: "22:40", lang: "english", url: defaultAudioPath },
-    { id: 3, title: "پښتو بیان - برخه لومړی", scholar: "مولانا احمد جان", date: "2025-09-26", duration: "18:30", lang: "pashto", url: defaultAudioPath },
-    { id: 4, title: "محاضرة بالعربية", scholar: "الشيخ محمد سعيد", date: "2025-09-25", duration: "40:10", lang: "arabic", url: defaultAudioPath },
-    { id: 5, title: "درس فارسی - بخش اول", scholar: "مولوی حسن رضا", date: "2025-09-24", duration: "28:50", lang: "farsi", url: defaultAudioPath },
-    { id: 6, title: "Türkçe Sohbet - Bölüm 1", scholar: "Hoca Mehmet", date: "2025-09-23", duration: "32:00", lang: "turkish", url: defaultAudioPath },
-    { id: 7, title: "سندی بیان - پهريون حصو", scholar: "مولانا عبدالحکیم", date: "2025-09-22", duration: "20:15", lang: "sindhi", url: defaultAudioPath },
-    { id: 8, title: "پنجابی خطاب - حصہ اول", scholar: "پیر غلام رسول", date: "2025-09-21", duration: "26:40", lang: "punjabi", url: defaultAudioPath },
-    { id: 9, title: "اصلاحی مجالس - حصہ دوم", scholar: "مولانا عبدالسلام", date: "2025-09-20", duration: "34:25", lang: "urdu", url: defaultAudioPath },
-    { id: 10, title: "Islamic Lecture - Part 2", scholar: "Shaykh Abdullah Khan", date: "2025-09-19", duration: "19:40", lang: "english", url: "/audio/bayan10.mp3" },
-    { id: 11, title: "پښتو بیان - برخه دویم", scholar: "مولانا سمیع اللہ", date: "2025-09-18", duration: "24:15", lang: "pashto", url: "/audio/bayan11.mp3" },
-    { id: 12, title: "محاضرة جديدة بالعربية", scholar: "الشيخ عبد الله", date: "2025-09-17", duration: "38:10", lang: "arabic", url: "/audio/bayan12.mp3" },
-    { id: 13, title: "درس فارسی - بخش دوم", scholar: "مولانا عبدالکریم", date: "2025-09-16", duration: "27:20", lang: "farsi", url: "/audio/bayan13.mp3" },
-    { id: 14, title: "Türkçe Sohbet - Bölüm 2", scholar: "Hoca Yusuf", date: "2025-09-15", duration: "33:00", lang: "turkish", url: "/audio/bayan14.mp3" },
-    { id: 15, title: "سندی بیان - ٻيو حصو", scholar: "مولوی محمد قاسم", date: "2025-09-14", duration: "22:30", lang: "sindhi", url: "/audio/bayan15.mp3" },
-    { id: 16, title: "پنجابی خطاب - حصہ دوم", scholar: "مولانا حبیب الرحمن", date: "2025-09-13", duration: "29:45", lang: "punjabi", url: "/audio/bayan16.mp3" },
-    { id: 17, title: "اصلاحی مجالس - حصہ سوم", scholar: "مولانا سراج الدین", date: "2025-09-12", duration: "35:00", lang: "urdu", url: "/audio/bayan17.mp3" },
-    { id: 18, title: "Islamic Lecture - Part 3", scholar: "Dr. Ahmed Latif", date: "2025-09-11", duration: "21:10", lang: "english", url: "/audio/bayan18.mp3" },
-    { id: 19, title: "پښتو بیان - برخه درېیم", scholar: "مولوی حامد", date: "2025-09-10", duration: "25:40", lang: "pashto", url: "/audio/bayan19.mp3" },
-    { id: 20, title: "محاضرة علمية", scholar: "الشيخ محمود", date: "2025-09-09", duration: "37:25", lang: "arabic", url: "/audio/bayan20.mp3" },
-    { id: 21, title: "درس فارسی - بخش سوم", scholar: "مولوی عبدالرشید", date: "2025-09-08", duration: "26:55", lang: "farsi", url: "/audio/bayan21.mp3" },
-    { id: 22, title: "Türkçe Sohbet - Bölüm 3", scholar: "Hoca Ali", date: "2025-09-07", duration: "31:20", lang: "turkish", url: "/audio/bayan22.mp3" },
-    { id: 23, title: "سندی بیان - ٽيون حصو", scholar: "مولانا عبدالغفور", date: "2025-09-06", duration: "23:10", lang: "sindhi", url: "/audio/bayan23.mp3" },
-    { id: 24, title: "پنجابی خطاب - حصہ سوم", scholar: "پیر نذیر احمد", date: "2025-09-05", duration: "28:15", lang: "punjabi", url: "/audio/bayan24.mp3" },
-    { id: 25, title: "اصلاحی مجالس - حصہ چہارم", scholar: "مولوی عبداللہ قریشی", date: "2025-09-04", duration: "36:40", lang: "urdu", url: "/audio/bayan25.mp3" },
-    { id: 26, title: "Islamic Lecture - Part 4", scholar: "Imam Bilal Hussain", date: "2025-09-03", duration: "20:35", lang: "english", url: "/audio/bayan26.mp3" },
-    { id: 27, title: "پښتو بیان - برخه څلورم", scholar: "مولانا عبدالبصیر", date: "2025-09-02", duration: "27:50", lang: "pashto", url: "/audio/bayan27.mp3" },
-    { id: 28, title: "محاضرة دينية", scholar: "الشيخ عبدالعزيز", date: "2025-09-01", duration: "39:05", lang: "arabic", url: "/audio/bayan28.mp3" },
-    { id: 29, title: "درس فارسی - بخش چهارم", scholar: "مولانا ناصر حسین", date: "2025-08-31", duration: "29:30", lang: "farsi", url: "/audio/bayan29.mp3" },
-    { id: 30, title: "Türkçe Sohbet - Bölüm 4", scholar: "Hoca Osman", date: "2025-08-30", duration: "34:00", lang: "turkish", url: "/audio/bayan30.mp3" },
-    { id: 31, title: "سندی بیان - چوٿون حصو", scholar: "مولانا عبدالله سومرو", date: "2025-08-29", duration: "21:45", lang: "sindhi", url: "/audio/bayan31.mp3" },
-    { id: 32, title: "پنجابی خطاب - حصہ چہارم", scholar: "مولانا فیض احمد", date: "2025-08-28", duration: "27:15", lang: "punjabi", url: "/audio/bayan32.mp3" },
-    { id: 33, title: "اصلاحی مجالس - حصہ پنجم", scholar: "مفتی عبدالکریم", date: "2025-08-27", duration: "33:25", lang: "urdu", url: "/audio/bayan33.mp3" },
-    { id: 34, title: "Islamic Lecture - Part 5", scholar: "Shaykh Salman Ali", date: "2025-08-26", duration: "22:00", lang: "english", url: "/audio/bayan34.mp3" },
-    { id: 35, title: "پښتو بیان - برخه پنځم", scholar: "مولوی فرید", date: "2025-08-25", duration: "24:50", lang: "pashto", url: "/audio/bayan35.mp3" },
-    { id: 36, title: "محاضرة تربوية", scholar: "الشيخ طارق", date: "2025-08-24", duration: "36:05", lang: "arabic", url: "/audio/bayan36.mp3" },
-    { id: 37, title: "درس فارسی - بخش پنجم", scholar: "مولانا یوسف علی", date: "2025-08-23", duration: "28:35", lang: "farsi", url: "/audio/bayan37.mp3" },
-    { id: 38, title: "Türkçe Sohbet - Bölüm 5", scholar: "Hoca İsmail", date: "2025-08-22", duration: "32:10", lang: "turkish", url: "/audio/bayan38.mp3" },
-    { id: 39, title: "سندی بیان - پنجون حصو", scholar: "مولوی محمد یعقوب", date: "2025-08-21", duration: "23:55", lang: "sindhi", url: "/audio/bayan39.mp3" },
-    { id: 40, title: "پنجابی خطاب - حصہ پنجم", scholar: "پیر ضیاء الحق", date: "2025-08-20", duration: "29:20", lang: "punjabi", url: "/audio/bayan40.mp3" },
-    { id: 41, title: "اصلاحی مجالس - حصہ ششم", scholar: "مولوی حنیف اللہ", date: "2025-08-19", duration: "31:45", lang: "urdu", url: "/audio/bayan41.mp3" },
-    { id: 42, title: "Islamic Lecture - Part 6", scholar: "Dr. Omar Siddiqi", date: "2025-08-18", duration: "20:55", lang: "english", url: "/audio/bayan42.mp3" },
-    { id: 43, title: "پښتو بیان - برخه شپږم", scholar: "مولانا محمد صادق", date: "2025-08-17", duration: "26:05", lang: "pashto", url: "/audio/bayan43.mp3" },
-    { id: 44, title: "محاضرة اسلامية", scholar: "الشيخ خالد", date: "2025-08-16", duration: "38:20", lang: "arabic", url: "/audio/bayan44.mp3" },
-    { id: 45, title: "درس فارسی - بخش ششم", scholar: "مولانا عبدالغنی", date: "2025-08-15", duration: "27:40", lang: "farsi", url: "/audio/bayan45.mp3" },
-    { id: 46, title: "Türkçe Sohbet - Bölüm 6", scholar: "Hoca Faruk", date: "2025-08-14", duration: "34:15", lang: "turkish", url: "/audio/bayan46.mp3" },
-    { id: 47, title: "سندی بیان - ڇهون حصو", scholar: "مولوی رشید احمد", date: "2025-08-13", duration: "22:05", lang: "sindhi", url: "/audio/bayan47.mp3" },
-    { id: 48, title: "پنجابی خطاب - حصہ ششم", scholar: "پیر انور شاہ", date: "2025-08-12", duration: "28:25", lang: "punjabi", url: "/audio/bayan48.mp3" },
-    { id: 49, title: "اصلاحی مجالس - حصہ هفتم", scholar: "مولانا اشرف علی", date: "2025-08-11", duration: "35:10", lang: "urdu", url: "/audio/bayan49.mp3" },
-    { id: 50, title: "Islamic Lecture - Part 7", scholar: "Shaykh Usman Qureshi", date: "2025-08-10", duration: "21:50", lang: "english", url: "/audio/bayan50.mp3" }
-  ];
+  // Fetch hamdonaatokalaam from API
+  useEffect(() => {
+    fetchHamdonaatokalaam();
+  }, []);
+
+  const fetchHamdonaatokalaam = async () => {
+    try {
+      const response = await fetch("/api/hamdonaatokalaam");
+      if (!response.ok) throw new Error("Failed to fetch hamdonaatokalaam");
+      const data = await response.json();
+      setHamdonaatokalaam(data);
+    } catch (err) {
+      console.error("Error fetching hamdonaatokalaam:", err);
+      setError("Failed to load hamdonaatokalaam");
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/hamdonaatokalaam", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add hamdonaatokalaam");
+      }
+
+      const newBayan = await response.json();
+      sethamdonaatokalaam((prev) => [...prev, newBayan]);
+      setFormData({
+        title: "",
+        scholar: "",
+        duration: "",
+        lang: "urdu",
+        url: "",
+      });
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Error adding hamdonaatokalaam:", err);
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Filter & Sort
-  const filtered = bayanat
+  const filtered = hamdonaatokalaam
     .filter((b) => b.lang === activeLang)
     .filter(
       (b) =>
@@ -90,11 +107,11 @@ export default function Kalaam() {
     )
     .sort((a, b) =>
       sortBy === "newest"
-        ? new Date(b.date) - new Date(a.date)
-        : new Date(a.date) - new Date(b.date)
+        ? b.id - a.id
+        : a.id - b.id
     );
 
-  // Handle Play logic based on AudioBayanaat improvements
+  // Handle Play logic
   const handlePlay = (bayan) => {
     if (currentAudio?.id === bayan.id) {
       if (isPlaying) {
@@ -141,7 +158,7 @@ export default function Kalaam() {
     };
   }, [currentAudio]);
 
-  // Update progress helper (using existing function body)
+  // Update progress helper
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       const prog =
@@ -150,16 +167,31 @@ export default function Kalaam() {
     }
   };
 
-
   return (
     <div className="bg-brand-light-bg min-h-screen py-16 px-4 sm:px-6 lg:px-12">
-      {/* Section Heading */}
+      {/* Section Heading with Add Button */}
       <div className="max-w-6xl mx-auto text-center mb-10">
-        <h3 className={`text-3xl md:text-4xl font-extrabold ${BRAND_DARK_TEXT} relative inline-block`}>
-          حمد و نعت و کلام
-          <span className={`absolute -bottom-2 start-1/2 -translate-x-1/2 w-24 h-1 ${BRAND_ACCENT} rounded-full`}></span>
-        </h3>
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <h3 className={`text-3xl md:text-4xl font-extrabold ${BRAND_DARK_TEXT}`}>
+            حمد و نعت و کلام
+          </h3>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-full text-2xl transition shadow-md"
+            title="Add new hamdonaatokalaam"
+          >
+            +
+          </button>
+        </div>
+        <span className={`block w-24 h-1 ${BRAND_ACCENT} rounded-full mx-auto`}></span>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="max-w-6xl mx-auto mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
+          {error}
+        </div>
+      )}
 
       {/* Language Tabs */}
       <motion.div
@@ -303,15 +335,14 @@ export default function Kalaam() {
       {/* Floating Player */}
       <AnimatePresence>
         {currentAudio && (
-
           <motion.div
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-              className="fixed inset-x-0 m-auto h-fit bottom-3 transform -translate-x-1/2 backdrop-blur-md 
+            className="fixed inset-x-0 m-auto h-fit bottom-3 transform -translate-x-1/2 backdrop-blur-md 
             bg-white/90 shadow-xl rounded-2xl px-4 py-3 flex items-center gap-3 
             w-[95%] sm:w-[80%] md:w-[600px] border border-emerald-200"
-            >
+          >
             <div className="flex-1 min-w-0">
               <h4 className="font-semibold text-sm md:text-base truncate text-brand-primary-text">
                 {currentAudio.title}
@@ -356,8 +387,111 @@ export default function Kalaam() {
         )}
       </AnimatePresence>
 
+      {/* ✅ Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl my-8">
+            <h3 className="text-2xl font-bold text-brand-primary-text mb-6">نیا بیان شامل کریں</h3>
 
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  عنوان
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  placeholder="بیان کا عنوان"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  مقرر
+                </label>
+                <input
+                  type="text"
+                  name="scholar"
+                  value={formData.scholar}
+                  onChange={handleInputChange}
+                  placeholder="مقرر کا نام"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  مدت (مثلاً 30:15)
+                </label>
+                <input
+                  type="text"
+                  name="duration"
+                  value={formData.duration}
+                  onChange={handleInputChange}
+                  placeholder="مثلاً 30:15"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  زبان
+                </label>
+                <select
+                  name="lang"
+                  value={formData.lang}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                >
+                  {languages.map((lang) => (
+                    <option key={lang} value={lang}>
+                      {lang.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  آڈیو لنک
+                </label>
+                <input
+                  type="url"
+                  name="url"
+                  value={formData.url}
+                  onChange={handleInputChange}
+                  placeholder="https://example.com/audio.mp3"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition disabled:opacity-50"
+                >
+                  {submitting ? "جاری ہے..." : "شامل کریں"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition"
+                >
+                  منسوخ کریں
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

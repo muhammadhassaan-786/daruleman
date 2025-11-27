@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 export default function Poetry() {
   const [activeLang, setActiveLang] = useState("urdu");
   const [poems, setPoems] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -36,7 +35,6 @@ export default function Poetry() {
 
   const fetchPoems = async () => {
     try {
-      setLoading(true);
       const response = await fetch("/api/poems");
       if (!response.ok) throw new Error("Failed to fetch poems");
       const data = await response.json();
@@ -44,8 +42,6 @@ export default function Poetry() {
     } catch (err) {
       console.error("Error fetching poems:", err);
       setError("Failed to load poems");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -197,45 +193,39 @@ export default function Poetry() {
         </div>
       )}
 
-      {/* ✅ Loading State */}
-      {loading && (
-        <div className="text-center text-brand-primary-text py-12">
-          <p>جاری ہے...</p>
-        </div>
-      )}
-
       {/* ✅ Language Tabs */}
-      {!loading && (
-        <>
-          <div className="flex justify-center flex-wrap gap-2 mb-8 sm:mb-12">
-            {languages.map((lang) => (
-              <button
-                key={lang}
-                onClick={() => setActiveLang(lang)}
-                className={`px-4 py-2 rounded-full text-sm sm:text-base transition font-medium ${
-                  activeLang === lang
-                    ? "bg-brand-accent text-white shadow"
-                    : "bg-white text-brand-accent border border-brand-accent hover:bg-brand-subtle-hover"
-                }`}
-              >
-                {lang.toUpperCase()}
-              </button>
-            ))}
-          </div>
+      <div className="flex justify-center flex-wrap gap-2 mb-8 sm:mb-12">
+        {languages.map((lang) => (
+          <button
+            key={lang}
+            onClick={() => setActiveLang(lang)}
+            className={`px-4 py-2 rounded-full text-sm sm:text-base transition font-medium ${
+              activeLang === lang
+                ? "bg-brand-accent text-white shadow"
+                : "bg-white text-brand-accent border border-brand-accent hover:bg-brand-subtle-hover"
+            }`}
+          >
+            {lang.toUpperCase()}
+          </button>
+        ))}
+      </div>
 
-          {/* ✅ Poetry Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
-            {filtered.length === 0 ? (
-              <p className="text-center text-gray-500 col-span-full">کوئی اشعار نہیں</p>
-            ) : (
-              filtered.map((poem, idx) => (
-                <motion.div
-                  key={poem.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: idx * 0.1 }}
-                  className="bg-white rounded-2xl shadow hover:shadow-lg transition border border-brand-subtle-hover overflow-hidden"
-                >
+      {/* ✅ Poetry Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
+        {poems.length === 0 ? (
+          <p className="text-center text-gray-500 col-span-full">کوئی اشعار نہیں</p>
+        ) : (
+          poems
+            .filter((p) => p.lang === activeLang)
+            .sort((a, b) => b.id - a.id)
+            .map((poem, idx) => (
+              <motion.div
+                key={poem.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.1 }}
+                className="bg-white rounded-2xl shadow hover:shadow-lg transition border border-brand-subtle-hover overflow-hidden"
+              >
                   {/* Header */}
                   <div className="bg-brand-accent text-white px-3 sm:px-4 py-2 flex justify-between items-center">
                     <h3 className="font-bold text-sm sm:text-base">{poem.title}</h3>
@@ -280,8 +270,6 @@ export default function Poetry() {
               ))
             )}
           </div>
-        </>
-      )}
 
       {/* ✅ Modal */}
       {isModalOpen && (
