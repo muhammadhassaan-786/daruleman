@@ -48,8 +48,17 @@ export default function Functions() {
   const [booksFormData, setBooksFormData] = useState({
     title: "",
     author: "",
-    price: "Free",
+    price: "",
     link: "",
+  });
+
+  // Islahi Majalis Form State
+  const [majalisFormData, setMajalisFormData] = useState({
+    title: "",
+    scholar: "",
+    duration: "",
+    lang: "urdu",
+    url: "",
   });
 
   const languages = [
@@ -255,11 +264,46 @@ export default function Functions() {
       setBooksFormData({
         title: "",
         author: "",
-        price: "Free",
+        price: "",
         link: "",
       });
       setActiveModal(null);
       alert("Book added successfully!");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Handlers for Islahi Majalis
+  const handleMajalisChange = (e) => {
+    const { name, value } = e.target;
+    setMajalisFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleMajalisSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/islahimajalis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(majalisFormData),
+      });
+
+      if (!response.ok) throw new Error("Failed to add islahi majalis");
+      setMajalisFormData({
+        title: "",
+        scholar: "",
+        duration: "",
+        lang: "urdu",
+        url: "",
+      });
+      setActiveModal(null);
+      alert("Islahi Majalis added successfully!");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -312,6 +356,14 @@ export default function Functions() {
       icon: Library,
       color: "bg-red-500",
       description: "کتابیں شامل کریں",
+    },
+    {
+      id: "islahimajalis",
+      label: "Islahi Majalis",
+      urdu: "اصلاحی مجالس",
+      icon: Mic,
+      color: "bg-indigo-500",
+      description: "اصلاحی مجالس شامل کریں",
     },
   ];
 
@@ -880,6 +932,121 @@ export default function Functions() {
                   value={booksFormData.link}
                   onChange={handleBooksChange}
                   placeholder="https://example.com/book"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition disabled:opacity-50"
+                >
+                  {submitting ? "جاری ہے..." : "شامل کریں"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition"
+                >
+                  منسوخ کریں
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Islahi Majalis */}
+      {activeModal === "islahimajalis" && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl my-8">
+            <h3 className="text-2xl font-bold text-brand-primary-text mb-6">
+              نیا اصلاحی مجلس شامل کریں
+            </h3>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleMajalisSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  عنوان
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={majalisFormData.title}
+                  onChange={handleMajalisChange}
+                  placeholder="مجلس کا عنوان"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  علماء/داروغہ
+                </label>
+                <input
+                  type="text"
+                  name="scholar"
+                  value={majalisFormData.scholar}
+                  onChange={handleMajalisChange}
+                  placeholder="علماء کا نام"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  مدت (منٹ میں)
+                </label>
+                <input
+                  type="number"
+                  name="duration"
+                  value={majalisFormData.duration}
+                  onChange={handleMajalisChange}
+                  placeholder="45"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  زبان
+                </label>
+                <select
+                  name="lang"
+                  value={majalisFormData.lang}
+                  onChange={handleMajalisChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
+                  required
+                >
+                  {languages.map((lang) => (
+                    <option key={lang} value={lang}>
+                      {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  آڈیو لنک
+                </label>
+                <input
+                  type="url"
+                  name="url"
+                  value={majalisFormData.url}
+                  onChange={handleMajalisChange}
+                  placeholder="https://example.com/audio.mp3"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
                   required
                 />

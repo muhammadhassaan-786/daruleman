@@ -143,12 +143,7 @@ export default function Books() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: idx * 0.1 }}
-                    onClick={() => {
-                      setSelectedBook(book);
-                      setPdfLoading(true);
-                      setPdfError("");
-                    }}
-                    className="bg-white rounded-2xl shadow hover:shadow-lg border border-brand-subtle-hover p-6 cursor-pointer transition hover:scale-105 transform"
+                    className="bg-white rounded-2xl shadow hover:shadow-lg border border-brand-subtle-hover p-6 transition"
                   >
                     <h3 className="text-lg font-bold text-brand-accent mb-2 leading-snug line-clamp-2">
                       {book.title}
@@ -157,9 +152,26 @@ export default function Books() {
                     <p className="text-sm text-gray-700 font-semibold mb-3">
                       قیمت: {book.price || "مفت"}
                     </p>
-                    <button className="w-full bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition">
-                      کھولیں
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedBook(book);
+                          setPdfLoading(true);
+                          setPdfError("");
+                        }}
+                        className="flex-1 bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-lg transition"
+                      >
+                        کھولیں
+                      </button>
+                      <a
+                        href={`https://wa.me/?text=Main ${encodeURIComponent(book.title)} khareedna chahta hun.`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2"
+                      >
+                        <span>خریدنی</span>
+                      </a>
+                    </div>
                   </motion.div>
                 ))
               )}

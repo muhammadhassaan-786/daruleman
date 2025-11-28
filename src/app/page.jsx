@@ -16,6 +16,7 @@ export default function Home() {
     const [quotes, setQuotes] = useState([]);
     const [audios, setAudios] = useState([]);
     const [bayanaat, setBayanaat] = useState([]);
+    const [majalis, setMajalis] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // Fetch latest data from APIs
@@ -41,6 +42,13 @@ export default function Home() {
                 if (bayRes.ok) {
                     const bayData = await bayRes.json();
                     setBayanaat(bayData.slice(0, 3));
+                }
+
+                // Fetch islahi majalis
+                const majalisRes = await fetch("/api/islahimajalis");
+                if (majalisRes.ok) {
+                    const majalisData = await majalisRes.json();
+                    setMajalis(majalisData.slice(0, 3));
                 }
             } catch (err) {
                 console.error("Error fetching data:", err);
@@ -321,6 +329,56 @@ export default function Home() {
                             onClick={() => navigateTo("/hamdonaat")}
                         >
                             تمام حمد و نعت و کلام سنیں
+                        </motion.button>
+                    </div>
+                </motion.section>
+
+                {/* تازہ ترین اصلاحی مجالس */}
+                <motion.section
+                    className="py-16 md:py-20 bg-brand-subtle-hover/70 rounded-2xl shadow-lg px-6 md:px-10 mt-10"
+                    variants={sectionVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                >
+                    <h2 className="text-3xl md:text-4xl font-bold text-center text-brand-accent mb-4">
+                        تازہ ترین اصلاحی مجالس
+                    </h2>
+                    <div className="w-28 h-1 bg-brand-accent mx-auto mb-10 rounded-full"></div>
+
+                    {loading ? (
+                        <div className="text-center py-10">
+                            <p className="text-gray-500">لوڈ ہو رہا ہے...</p>
+                        </div>
+                    ) : majalis.length > 0 ? (
+                        <div className="bg-white border border-brand-subtle-hover rounded-xl shadow overflow-hidden">
+                            {majalis.map((item, idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex items-center justify-between p-5 border-b border-brand-subtle-hover last:border-none"
+                                >
+                                    <div className="text-right">
+                                        <h3 className="text-lg font-semibold text-brand-accent">{item.title}</h3>
+                                        <p className="text-sm text-brand-primary-text">{item.scholar}</p>
+                                    </div>
+                                    <p className="text-sm text-brand-primary-text">{item.duration}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-10">
+                            <p className="text-gray-500">کوئی اصلاحی مجلس دستیاب نہیں</p>
+                        </div>
+                    )}
+
+                    <div className="text-center mt-8">
+                        <motion.button
+                            className="px-6 py-3 bg-brand-accent text-white rounded-lg shadow-md"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => navigateTo("/islahi-majalis")}
+                        >
+                            تمام اصلاحی مجالس سنیں
                         </motion.button>
                     </div>
                 </motion.section>

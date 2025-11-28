@@ -35,6 +35,7 @@ export default function Header() {
         { title: "تحریری اشعار", path: "/poetry" },
         { title: "ملفوظات", path: "/quotes" },
         { title: "کتابیں", path: "/books" },
+        { title: "اصلاحی مجالس", path: "/islahi-majalis" },
       ],
     },
     {
