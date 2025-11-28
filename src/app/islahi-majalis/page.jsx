@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause, Search, Download } from "lucide-react";
+import { Play, Pause, Save, Download, X, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function IslahiMajalis() {
@@ -16,9 +16,11 @@ export default function IslahiMajalis() {
 
   const audioRef = useRef(null);
 
-  const BRAND_ACCENT = "bg-brand-accent";
-  const BRAND_ACCENT_TEXT = "text-brand-accent";
-  const BRAND_DARK_TEXT = "text-brand-primary-text";
+  // Mapped brand classes for styling consistency
+  const BRAND_ACCENT = 'bg-brand-accent';
+  const BRAND_ACCENT_TEXT = 'text-brand-accent';
+  const BRAND_DARK_TEXT = 'text-brand-primary-text';
+  const BRAND_SUBTLE_HOVER = 'hover:bg-brand-subtle-hover';
 
   const languages = [
     "urdu", "english", "pashto", "arabic", "farsi", "turkish", "sindhi", "punjabi",
@@ -52,8 +54,8 @@ export default function IslahiMajalis() {
       sortBy === "newest" ? b.id - a.id : a.id - b.id
     );
 
-  const handlePlay = (majalis) => {
-    if (currentAudio?.id === majalis.id) {
+  const handlePlay = (bayan) => {
+    if (currentAudio?.id === bayan.id) {
       if (isPlaying) {
         audioRef.current.pause();
         setIsPlaying(false);
@@ -62,17 +64,17 @@ export default function IslahiMajalis() {
         setIsPlaying(true);
       }
     } else {
-      setCurrentAudio(majalis);
+      setCurrentAudio(bayan);
     }
   };
 
   useEffect(() => {
     if (currentAudio && audioRef.current) {
-      audioRef.current.load();
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(error => {
-        console.error("Error attempting to play audio:", error);
-        setIsPlaying(false);
-      });
+        audioRef.current.load();
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(error => {
+          console.error("Error attempting to play audio:", error);
+          setIsPlaying(false);
+        });
     }
   }, [currentAudio]);
 
@@ -97,46 +99,33 @@ export default function IslahiMajalis() {
       audioRef.current?.removeEventListener("play", handlePlayEvent);
       audioRef.current?.removeEventListener("pause", handlePauseEvent);
     };
-  }, []);
+  }, [currentAudio]);
+
 
   return (
-    <div className="bg-brand-light-bg min-h-screen py-10 px-3 sm:px-6 lg:px-12">
-      {/* ✅ Title */}
-      <div className="max-w-6xl mx-auto text-center mb-8 sm:mb-12">
-        <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-brand-primary-text mb-4">
+    <div className="bg-brand-light-bg min-h-screen py-16 px-4 sm:px-6 lg:px-12">
+      {/* Section Heading */}
+      <div className="max-w-6xl mx-auto text-center mb-10">
+        <h3 className={`text-3xl md:text-4xl font-extrabold ${BRAND_DARK_TEXT} mb-4`}>
           اصلاحی مجالس
         </h3>
-        <p className="text-sm sm:text-base text-brand-accent">Islahi Majalis - اصلاحی مجالس</p>
+        <span className={`block w-24 h-1 ${BRAND_ACCENT} rounded-full mx-auto`}></span>
       </div>
 
-      {/* ✅ Error Message */}
+      {/* Error Message */}
       {error && (
         <div className="max-w-6xl mx-auto mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
           {error}
         </div>
       )}
 
-      {/* ✅ Search Bar */}
-      <div className="max-w-6xl mx-auto mb-8">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="تلاش کریں..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-accent"
-          />
-        </div>
-      </div>
-
-      {/* ✅ Language Dropdown */}
-      <div className="max-w-6xl mx-auto mb-8 flex justify-end">
+      {/* Language Dropdown */}
+      <div className="max-w-6xl mx-auto mb-6 flex justify-end">
         <div className="relative w-1/3 sm:w-48">
           <select
             value={activeLang}
             onChange={(e) => setActiveLang(e.target.value)}
-            className={`w-full appearance-none px-3 py-2 pr-8 rounded-lg text-xs sm:text-sm font-medium shadow-md transition-all cursor-pointer ${BRAND_ACCENT} text-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent-dark`}
+            className={`w-full appearance-none px-3 py-2 pr-8 rounded-lg text-xs sm:text-sm md:text-base font-medium shadow-md transition-all cursor-pointer ${BRAND_ACCENT} text-white hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-accent-dark`}
           >
             <option value="urdu">اردو</option>
             <option value="english">English</option>
@@ -155,82 +144,173 @@ export default function IslahiMajalis() {
         </div>
       </div>
 
-      {/* ✅ Main Content */}
-      <div className="max-w-6xl mx-auto">
-        {filtered.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">کوئی اصلاحی مجلس نہیں</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AnimatePresence>
-              {filtered.map((majalis, idx) => (
-                <motion.div
-                  key={majalis.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.3, delay: idx * 0.1 }}
-                  className={`${
-                    currentAudio?.id === majalis.id
-                      ? `${BRAND_ACCENT} shadow-xl`
-                      : "bg-white shadow-md"
-                  } rounded-xl p-6 border border-brand-subtle-hover hover:shadow-lg transition-all duration-300`}
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1 text-right">
-                      <h3 className={`text-lg font-semibold ${currentAudio?.id === majalis.id ? "text-white" : BRAND_DARK_TEXT}`}>
-                        {majalis.title}
-                      </h3>
-                      <p className={`text-sm ${currentAudio?.id === majalis.id ? "text-white/80" : "text-gray-600"}`}>
-                        مقرر: {majalis.scholar}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handlePlay(majalis)}
-                      className={`ml-4 flex-shrink-0 p-3 rounded-full transition ${
-                        currentAudio?.id === majalis.id
-                          ? "bg-white/20"
-                          : "bg-brand-subtle-hover hover:bg-brand-accent"
-                      }`}
-                    >
-                      {currentAudio?.id === majalis.id && isPlaying ? (
-                        <Pause className={`w-6 h-6 ${currentAudio?.id === majalis.id ? "text-white" : BRAND_ACCENT_TEXT}`} />
-                      ) : (
-                        <Play className={`w-6 h-6 ${currentAudio?.id === majalis.id ? "text-white" : BRAND_ACCENT_TEXT}`} />
-                      )}
-                    </button>
-                  </div>
-
-                  {/* ✅ Progress Bar (only show when selected) */}
-                  {currentAudio?.id === majalis.id && (
-                    <>
-                      <div className="mb-4">
-                        <div className="w-full bg-white/20 rounded-full h-1 overflow-hidden">
-                          <div
-                            className="h-full bg-white transition-all"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                      </div>
-                      <audio
-                        ref={audioRef}
-                        src={majalis.url}
-                        className="w-full"
-                      />
-                    </>
-                  )}
-
-                  <div className={`flex items-center justify-between text-sm ${currentAudio?.id === majalis.id ? "text-white/80" : "text-gray-600"}`}>
-                    <span>{majalis.duration}</span>
-                    <span>{majalis.lang.toUpperCase()}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
+      {/* Search */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-3 mb-6">
+        <div className="relative w-full md:w-1/2">
+          <input
+            type="text"
+            placeholder="🔍 تلاش کریں (عنوان یا مقرر)"
+            className={`w-full border rounded-lg py-2 px-4 pr-10 text-sm md:text-base shadow-sm focus:ring-brand-accent focus:border-brand-accent`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Search className="absolute right-3 top-2.5 text-gray-400 w-5 h-5" />
+        </div>
       </div>
+
+      {/* Desktop Table */}
+      <div className="hidden md:block overflow-x-auto bg-white shadow-lg rounded-xl">
+        <table className="w-full text-right border-collapse rounded-xl overflow-hidden">
+          <thead className={`${BRAND_ACCENT} text-white text-sm md:text-base`}>
+            <tr>
+              <th className="p-3">نمبر</th>
+              <th className="p-3">عنوان</th>
+              <th className="p-3">مقرر</th>
+              <th className="p-3">تاریخ</th>
+              <th className="p-3">مدت</th>
+              <th className="p-3">سنیں</th>
+              <th className="p-3">محفوظ کریں</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((m, idx) => (
+              <motion.tr
+                key={m.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.05 }}
+                className={`${
+                  idx % 2 === 0 ? "bg-gray-50" : "bg-white"
+                } border-b hover:bg-brand-subtle-hover/50 text-sm md:text-base`}
+              >
+                <td className="p-3">{idx + 1}</td>
+                <td className="p-3 font-medium break-words">{m.title}</td>
+                <td className="p-3 text-gray-700">{m.scholar}</td>
+                <td className="p-3 text-gray-500">
+                  {new Date(m.date).toLocaleDateString("en-US", {
+                    year: "numeric", month: "short", day: "numeric",
+                  })}
+                </td>
+                <td className="p-3">{m.duration}</td>
+                <td className="p-3">
+                  <button
+                    onClick={() => handlePlay(m)}
+                    className="bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition shadow"
+                  >
+                    {currentAudio?.id === m.id && isPlaying ? (<Pause size={16} />) : (<Play size={16} />)}
+                  </button>
+                </td>
+                <td className="p-3 flex gap-2 justify-end">
+                  <button className={`${BRAND_ACCENT} text-white p-2 rounded-md hover:bg-brand-primary-text transition shadow`}>
+                    <Save size={16} />
+                  </button>
+                  <button className="bg-gray-600 text-white p-2 rounded-md hover:bg-gray-700 transition shadow">
+                    <Download size={16} />
+                  </button>
+                </td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-4">
+        {filtered.map((m, idx) => (
+          <motion.div
+            key={m.id}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: idx * 0.05 }}
+            className={`bg-white p-4 rounded-xl shadow border-r-4 border-brand-accent`}
+          >
+            <h4 className="font-semibold text-base break-words">{m.title}</h4>
+            <p className="text-sm text-gray-700">{m.scholar}</p>
+            <p className="text-xs text-gray-500">
+              {new Date(m.date).toLocaleDateString("en-US")} • {m.duration}
+            </p>
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => handlePlay(m)}
+                className="flex-1 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition flex items-center justify-center gap-1 shadow"
+              >
+                {currentAudio?.id === m.id && isPlaying ? (
+                  <>
+                    <Pause size={16} /> Pause
+                  </>
+                ) : (
+                  <>
+                    <Play size={16} /> Play
+                  </>
+                )}
+              </button>
+              <button className={`${BRAND_ACCENT} text-white p-2 rounded-md hover:bg-brand-primary-text transition shadow`}>
+                <Save size={16} />
+              </button>
+              <button className="bg-gray-600 text-white p-2 rounded-md hover:bg-gray-700 transition shadow">
+                <Download size={16} />
+              </button>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Floating Player it is */}
+      <AnimatePresence>
+        {currentAudio && (
+
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+              className="fixed inset-x-0 m-auto h-fit bottom-3 transform -translate-x-1/2 backdrop-blur-md 
+            bg-white/90 shadow-xl rounded-2xl px-4 py-3 flex items-center gap-3 
+            w-[95%] sm:w-[80%] md:w-[600px] border border-emerald-200"
+            >
+            <div className="flex-1 min-w-0">
+              <h4 className="font-semibold text-sm md:text-base truncate text-brand-primary-text">
+                {currentAudio.title}
+              </h4>
+              <p className="text-xs md:text-sm text-gray-500 truncate">
+                {currentAudio.scholar}
+              </p>
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-200 h-1 mt-2 rounded-full overflow-hidden">
+                <div
+                  className={`${BRAND_ACCENT} h-1 transition-all duration-200`}
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => handlePlay(currentAudio)}
+              className="bg-blue-600 text-white p-2 md:p-3 rounded-full hover:bg-blue-700 transition shadow"
+            >
+              {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+            </button>
+
+            <button
+              onClick={() => {
+                audioRef.current.pause();
+                setCurrentAudio(null);
+                setIsPlaying(false);
+              }}
+              className="bg-red-600 text-white p-2 md:p-3 rounded-full hover:bg-red-700 transition shadow"
+            >
+              <X size={18} />
+            </button>
+
+            <audio
+              ref={audioRef}
+              src={currentAudio.url}
+              onTimeUpdate={handleTimeUpdate}
+              onEnded={() => setIsPlaying(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
