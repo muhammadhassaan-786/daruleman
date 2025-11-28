@@ -114,13 +114,6 @@ export default function Books() {
               <h2 className="text-3xl md:text-4xl font-extrabold text-brand-primary-text">
                 کتابیں
               </h2>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-brand-accent hover:bg-brand-accent-dark text-white font-bold py-2 px-4 rounded-full text-2xl transition shadow-md"
-                title="Add new book"
-              >
-                +
-              </button>
             </div>
             <div className="mt-2 w-20 h-1 bg-brand-accent rounded mx-auto"></div>
           </div>
@@ -135,7 +128,7 @@ export default function Books() {
           {/* ✅ Books Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {books.length === 0 ? (
-              <p className="text-center text-gray-500 col-span-full">کوئی کتابیں نہیں</p>
+              <p className="text-center text-gray-500 col-span-full">لوڈ ہو رہی ہیں...</p>
             ) : (
               books.sort((a, b) => b.id - a.id).map((book, idx) => (
                   <motion.div
@@ -169,7 +162,7 @@ export default function Books() {
                         rel="noopener noreferrer"
                         className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition flex items-center justify-center gap-2"
                       >
-                        <span>خریدنی</span>
+                        <span>خریدیں</span>
                       </a>
                     </div>
                   </motion.div>

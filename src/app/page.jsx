@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { FaUser } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Play, Pause } from "lucide-react";
 
 const logoPath = "/assets/logo.avif";
 const audioPath = "/assets/audio.mp3";
@@ -13,11 +14,14 @@ const bg3Path = "/assets/bg3.avif";
 
 export default function Home() {
     const router = useRouter();
+    const audioRef = useRef(null);
     const [quotes, setQuotes] = useState([]);
     const [audios, setAudios] = useState([]);
     const [bayanaat, setBayanaat] = useState([]);
     const [majalis, setMajalis] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentMajalis, setCurrentMajalis] = useState(null);
+    const [isPlayingMajalis, setIsPlayingMajalis] = useState(false);
 
     // Fetch latest data from APIs
     useEffect(() => {
@@ -62,7 +66,7 @@ export default function Home() {
 
     // ❌ Corrected routes to match converted Next.js paths
     const features = [
-        { icon: "✸", title: "تعارف دار الایمان والتقویٰ", desc: "جامعہ اور اس کی خدمات ایک نظر میں", route: "/introduction" },
+        { icon: "✸", title: "تعارف دار الایمان والتقویٰ", desc: "جامعہ اور اس کی خدمات ایک نظر میں", route: "/history" },
         { icon: "🕌", title: "مفتی سید مختار الدین شاہ", desc: "تعارف، علمی و تحقیقی خدمات", route: "/chishthistory" },
         { icon: "📖", title: "کتابیں", desc: "مفید علمی و اصلاحی کتب", route: "/books" },
         { icon: "🕋", title: "آڈیو و کلام", desc: "قرآن و سنت پر مبنی تعلیمات کا علمبردار", route: "/audiobayanaat" },
@@ -156,23 +160,56 @@ export default function Home() {
                 </motion.section> 
 
                 {/* اس ہفتے کی مجلس */}
-                <section className="w-full flex flex-col items-center justify-center py-8 bg-brand-subtle-hover/50">
+                <motion.section
+                    className="py-16 md:py-20 bg-brand-subtle-hover/70 rounded-2xl shadow-lg px-6 md:px-10 mt-10"
+                    variants={sectionVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                >
                     {/* ✅ text-brand-accent */}
-                    <h2 className="text-3xl font-bold text-brand-accent text-center mb-2">اس ہفتے کی مجلس</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-center text-brand-accent mb-4">
+                        اس ہفتے کی مجلس</h2>
+                    {/* </h2> */}
                     {/* ✅ bg-brand-accent */}
-                    <div className="w-24 h-1 bg-brand-accent rounded-full mb-10"></div>
-                    {/* ✅ border-brand-subtle-hover */}
-                    <div className="bg-white border border-brand-subtle-hover shadow-lg rounded-xl p-8 w-full md:w-[600px] text-center">
-                        {/* ✅ text-brand-accent */}
-                        <h3 className="text-xl font-semibold text-brand-accent mb-1">اصلاحی مجلس - حصہ اول</h3>
-                        {/* ✅ text-brand-primary-text */}
-                        <p className="text-sm text-brand-primary-text mb-5">مفتی سید مختار الدین شاہ صاحب</p>
-                        <audio controls className="w-full rounded-lg">
-                            <source src={audioPath} type="audio/mp3" />
-                            آپ کا براؤزر آڈیو پلیئر کو سپورٹ نہیں کرتا۔
-                        </audio>
+                    <div className="w-28 h-1 bg-brand-accent mx-auto mb-10 rounded-full"></div>
+
+                    {loading ? (
+                        <div className="text-center py-10">
+                            <p className="text-gray-500">لوڈ ہو رہا ہے...</p>
+                        </div>
+                    ) : audios.length > 0 ? (
+                        <div className="bg-white border border-brand-subtle-hover rounded-xl shadow overflow-hidden">
+                            {audios.map((audio, idx) => (
+                                <div
+                                    key={idx}
+                                    className="flex items-center justify-between p-5 border-b border-brand-subtle-hover last:border-none"
+                                >
+                                    <div className="text-right">
+                                        <h3 className="text-lg font-semibold text-brand-accent">{audio.title}</h3>
+                                        <p className="text-sm text-brand-primary-text">{audio.scholar}</p>
+                                    </div>
+                                    <p className="text-sm text-brand-primary-text">{audio.duration}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-10">
+                            <p className="text-gray-500">کوئی آڈیو دستیاب نہیں</p>
+                        </div>
+                    )}
+
+                    <div className="text-center mt-8">
+                        <motion.button
+                            className="px-6 py-3 bg-brand-accent text-white rounded-lg shadow-md"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => navigateTo("/audiobayanaat")}
+                        >
+                            تمام آڈیو بیانات سنیں
+                        </motion.button>
                     </div>
-                </section>
+                </motion.section>
 
                 {/* منتخب ملفوظات */}
                 <motion.section
@@ -221,59 +258,6 @@ export default function Home() {
                             onClick={() => navigateTo("/quotes")}
                         >
                             تمام ملفوظات پڑھیں
-                        </motion.button>
-                    </div>
-                </motion.section>
-
-                {/* تازہ ترین آڈیو بیانات */}
-                {/* ✅ bg-brand-subtle-hover/70 */}
-                <motion.section
-                    className="py-16 md:py-20 bg-brand-subtle-hover/70 rounded-2xl shadow-lg px-6 md:px-10 mt-10"
-                    variants={sectionVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                >
-                    {/* ✅ text-brand-accent */}
-                    <h2 className="text-3xl md:text-4xl font-bold text-center text-brand-accent mb-4">
-                        تازہ ترین آڈیو بیانات
-                    </h2>
-                    {/* ✅ bg-brand-accent */}
-                    <div className="w-28 h-1 bg-brand-accent mx-auto mb-10 rounded-full"></div>
-
-                    {loading ? (
-                        <div className="text-center py-10">
-                            <p className="text-gray-500">لوڈ ہو رہا ہے...</p>
-                        </div>
-                    ) : audios.length > 0 ? (
-                        <div className="bg-white border border-brand-subtle-hover rounded-xl shadow overflow-hidden">
-                            {audios.map((audio, idx) => (
-                                <div
-                                    key={idx}
-                                    className="flex items-center justify-between p-5 border-b border-brand-subtle-hover last:border-none"
-                                >
-                                    <div className="text-right">
-                                        <h3 className="text-lg font-semibold text-brand-accent">{audio.title}</h3>
-                                        <p className="text-sm text-brand-primary-text">{audio.scholar}</p>
-                                    </div>
-                                    <p className="text-sm text-brand-primary-text">{audio.duration}</p>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-10">
-                            <p className="text-gray-500">کوئی آڈیو دستیاب نہیں</p>
-                        </div>
-                    )}
-
-                    <div className="text-center mt-8">
-                        <motion.button
-                            className="px-6 py-3 bg-brand-accent text-white rounded-lg shadow-md"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => navigateTo("/audiobayanaat")}
-                        >
-                            تمام آڈیو بیانات سنیں
                         </motion.button>
                     </div>
                 </motion.section>
@@ -333,41 +317,43 @@ export default function Home() {
                     </div>
                 </motion.section>
 
-                {/* تازہ ترین اصلاحی مجالس */}
+                {/* تازہ ترین آڈیو بیانات */}
                 <motion.section
-                    className="py-16 md:py-20 bg-brand-subtle-hover/70 rounded-2xl shadow-lg px-6 md:px-10 mt-10"
+                    className="py-16 md:py-20"
                     variants={sectionVariants}
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                 >
+                    {/* ✅ text-brand-accent */}
                     <h2 className="text-3xl md:text-4xl font-bold text-center text-brand-accent mb-4">
-                        تازہ ترین اصلاحی مجالس
+                        تازہ ترین آڈیو بیانات
                     </h2>
+                    {/* ✅ bg-brand-accent */}
                     <div className="w-28 h-1 bg-brand-accent mx-auto mb-10 rounded-full"></div>
 
                     {loading ? (
                         <div className="text-center py-10">
                             <p className="text-gray-500">لوڈ ہو رہا ہے...</p>
                         </div>
-                    ) : majalis.length > 0 ? (
+                    ) : audios.length > 0 ? (
                         <div className="bg-white border border-brand-subtle-hover rounded-xl shadow overflow-hidden">
-                            {majalis.map((item, idx) => (
+                            {audios.map((audio, idx) => (
                                 <div
                                     key={idx}
                                     className="flex items-center justify-between p-5 border-b border-brand-subtle-hover last:border-none"
                                 >
                                     <div className="text-right">
-                                        <h3 className="text-lg font-semibold text-brand-accent">{item.title}</h3>
-                                        <p className="text-sm text-brand-primary-text">{item.scholar}</p>
+                                        <h3 className="text-lg font-semibold text-brand-accent">{audio.title}</h3>
+                                        <p className="text-sm text-brand-primary-text">{audio.scholar}</p>
                                     </div>
-                                    <p className="text-sm text-brand-primary-text">{item.duration}</p>
+                                    <p className="text-sm text-brand-primary-text">{audio.duration}</p>
                                 </div>
                             ))}
                         </div>
                     ) : (
                         <div className="text-center py-10">
-                            <p className="text-gray-500">کوئی اصلاحی مجلس دستیاب نہیں</p>
+                            <p className="text-gray-500">کوئی آڈیو دستیاب نہیں</p>
                         </div>
                     )}
 
@@ -376,9 +362,9 @@ export default function Home() {
                             className="px-6 py-3 bg-brand-accent text-white rounded-lg shadow-md"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            onClick={() => navigateTo("/islahi-majalis")}
+                            onClick={() => navigateTo("/audiobayanaat")}
                         >
-                            تمام اصلاحی مجالس سنیں
+                            تمام آڈیو بیانات سنیں
                         </motion.button>
                     </div>
                 </motion.section>
