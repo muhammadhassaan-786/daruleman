@@ -312,10 +312,21 @@ export default function Kalaam() {
 
             <audio
               ref={audioRef}
-              src={currentAudio.url}
               onTimeUpdate={handleTimeUpdate}
               onEnded={() => setIsPlaying(false)}
-            />
+              preload="auto"
+              crossOrigin="anonymous"
+            >
+              {/* OPUS primary (most efficient for desktop) */}
+              <source src={currentAudio.url} type='audio/ogg; codecs="opus"' />
+              {/* MP3 fallback (Android/iOS compatibility) */}
+              <source src={currentAudio.url.replace(/\.opus$/i, ".mp3")} type="audio/mpeg" />
+              {/* AAC fallback for iOS */}
+              <source src={currentAudio.url.replace(/\.opus$/i, ".m4a")} type="audio/aac" />
+              {/* WebM fallback */}
+              <source src={currentAudio.url.replace(/\.opus$/i, ".webm")} type='audio/webm; codecs="opus"' />
+              Your browser does not support the audio element.
+            </audio>
           </motion.div>
         )}
       </AnimatePresence>
